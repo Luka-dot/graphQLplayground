@@ -14,7 +14,7 @@ const typeDefs = `
 const resolvers = {
     Query: {
         id() {
-            return 'abc123'
+            return 'ZXT234'
         },
         name() {
             return 'Lukas'
@@ -26,7 +26,7 @@ const resolvers = {
             return true
         },
         gpa() {
-            return 3.77
+            return 3.77  // can return null since we did not define type with !
         }
     }
 }
