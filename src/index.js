@@ -24,21 +24,21 @@ const posts = [{
     title: "post one",
     body: "lukas@gma.com",
     published: true,
-    autor: '1'
+    author: 1
 },
 {
     id: 12,
     title: "post TWO",
     body: "random text",
     published: true,
-    autor: '1'
+    author: 1
 },
 {
     id: 13,
     title: "post THREE",
     body: "More and more of random text",
     published: false,
-    autor: '2'
+    author: 2
 }]
 
 // Type definitions (schema)
@@ -105,9 +105,9 @@ const resolvers = {
         }
     },
     Post: {
-        autor(parent, arg, ctx, info) {
+        author(parent, arg, ctx, info) {
             return users.find((user) => {
-                return user.id === parent.id
+                return user.id === parent.author
             })
         }
     }
