@@ -20,22 +20,25 @@ const users = [{
 }]
 
 const posts = [{
-    id: 1,
+    id: 11,
     title: "post one",
     body: "lukas@gma.com",
-    published: true
+    published: true,
+    autor: '1'
 },
 {
-    id: 2,
+    id: 12,
     title: "post TWO",
     body: "random text",
-    published: true
+    published: true,
+    autor: '1'
 },
 {
-    id: 3,
+    id: 13,
     title: "post THREE",
     body: "More and more of random text",
-    published: false
+    published: false,
+    autor: '2'
 }]
 
 // Type definitions (schema)
@@ -59,6 +62,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     } 
 `
 // Resolvers
@@ -98,6 +102,13 @@ const resolvers = {
                 body: 'This is a post to my new grapQL API',
                 published: true
             }
+        }
+    },
+    Post: {
+        autor(parent, arg, ctx, info) {
+            return users.find((user) => {
+                return user.id === parent.id
+            })
         }
     }
 }
