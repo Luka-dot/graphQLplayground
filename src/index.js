@@ -44,22 +44,26 @@ const posts = [{
 const comments = [{
     id: 31,
     text: 'This is first comment',
-    author: 1
+    author: 1,
+    post: 13
 },
 {
     id: 32,
     text: "this is another new comment",
-    author: 1
+    author: 1,
+    post: 11
 },
 {
     id:  33,
     text: 'Im running out of ideas for comments',
-    author: 3
+    author: 3,
+    post:11
 },
 {
     id: 34,
     text: 'Finally this is a last one I have to come up ith )',
-    author: 3
+    author: 3,
+    post: 13
 }
 ]
 
@@ -88,7 +92,7 @@ const typeDefs = `
         body: String!
         published: Boolean!
         author: User!
-        comments: [comment!]!
+        comments: [Comment!]!
     } 
 
     type Comment {
@@ -106,9 +110,9 @@ const resolvers = {
                 return posts
             }
 
-            return posts.filter((post) => {
-                return post.title.toLowerCase().includes(args.query.toLowerCase()) || post.body.toLowerCase().includes(args.query.toLowerCase())
-            })
+            // return posts.filter((post) => {
+            //     return post.title.toLowerCase().includes(args.query.toLowerCase()) || post.body.toLowerCase().includes(args.query.toLowerCase())
+            // })
         },
         comments(parent, args, ctx, info) {
             if (!args.query) {
@@ -149,6 +153,11 @@ const resolvers = {
             return users.find((user) => {
                 return user.id === parent.author
             })
+        },
+        comments(parent, arg, ctx, info) {
+            return comments.filter((comment) => {
+                return comment.post === parent.id
+            })
         }
     },
     User: {
@@ -167,6 +176,11 @@ const resolvers = {
         author(parent, arg, ctx, info) {
             return users.find((user) => {
                 return user.id === parent.author
+            })
+        },
+        post(parent, arg, ctx, info) {
+            return posts.find((post) => {
+                return post.id === parent.post
             })
         }
     }
