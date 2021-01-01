@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Spread operators plug in:  https://www.npmjs.com/package/babel-plugin-transform-object-rest-spread
 
 // temp user data before database set up
-const users = [{
+let users = [{
     id: '1',
     name: "Lukas",
     email: "lukas@gma.com",
@@ -22,7 +22,7 @@ const users = [{
     email: "mouse@gma.com"
 }]
 
-const posts = [{
+let posts = [{
     id: '11',
     title: "post one",
     body: "lukas@gma.com",
@@ -44,7 +44,7 @@ const posts = [{
     author: '2'
 }];
 
-const comments = [{
+let comments = [{
     id: '31',
     text: 'This is first comment',
     author: '1',
@@ -82,8 +82,9 @@ const typeDefs = `
 
     type Mutation {
         createUser(data: CreateUserInput!): User!
-        createPost(data: CreatePost!): Post!
-        createComment(data: CreateComment!): Comment!
+        deleteUser(id: ID!): User!
+        createPost(data: CreatePostInput!): Post!
+        createComment(data: CreateCommentInput!): Comment!
     }
 
     input CreateUserInput {
@@ -92,17 +93,17 @@ const typeDefs = `
         age: Int
     }
 
-    input CreateComment {
-        text: String!
-        author: ID!
-        post: ID!
-    }
-
-    input CreatePost {
+    input CreatePostInput {
         title: String!
         body: String!
         published: Boolean!
         author: ID! 
+    }
+
+    input CreateCommentInput {
+        text: String!
+        author: ID!
+        post: ID!
     }
     
     type User {
@@ -200,6 +201,34 @@ const resolvers = {
             users.push(user)
 
             return user
+        },
+        deleteUser(parent, arg, ctx, info) {
+            const userIndex = users.findIndex((user) => {
+                return user.id === arg.id
+            })
+
+            if (userIndex === -1) {
+                throw new Error('User not found!')
+            }
+
+            const deletedUsers = users.splice(userIndex, 1)  // so this deletedUser can be returned. Mutation expects return User!
+
+            posts = posts.filter((post) => {
+                const match = post.author === arg.id
+
+                if (match) {
+                    comments = comments.filter((comment) => {
+                        return comment.post !== post.id
+                    })
+                }
+
+                return !match
+            })
+
+            comments = comments.filter((comment) => comment.author !== arg.id)
+
+            return deletedUsers[0]
+
         },
         createPost(parent, arg, ctx, info) {
             const verifyAuthor = users.some((user) => { 
