@@ -81,9 +81,28 @@ const typeDefs = `
     }
 
     type Mutation {
-        createUser(name: String!, email: String!, age: Int): User!
-        createPost(title: String!, body: String!, published: Boolean!, author: ID! ): Post!
-        createComment(text: String!, author: ID!, post: ID!): Comment!
+        createUser(data: CreateUserInput!): User!
+        createPost(data: CreatePost!): Post!
+        createComment(data: CreateComment!): Comment!
+    }
+
+    input CreateUserInput {
+        name: String!
+        email: String!
+        age: Int
+    }
+
+    input CreateComment {
+        text: String!
+        author: ID!
+        post: ID!
+    }
+
+    input CreatePost {
+        title: String!
+        body: String!
+        published: Boolean!
+        author: ID! 
     }
     
     type User {
@@ -160,7 +179,7 @@ const resolvers = {
     Mutation: {
         createUser(parent,arg, ctx, info) {
             const emailTaken = users.some((user) => {
-                return user.email === arg.email
+                return user.email === arg.data.email
             })
 
             if (emailTaken) {
@@ -169,7 +188,7 @@ const resolvers = {
 
             const user = {
                 id: uuidv4(),
-                ...arg
+                ...arg.data
             }
             // const user = {
             //     id: uuidv4(),
@@ -184,7 +203,7 @@ const resolvers = {
         },
         createPost(parent, arg, ctx, info) {
             const verifyAuthor = users.some((user) => { 
-                return user.id === arg.author
+                return user.id === arg.data.author
             }) 
 
             if (!verifyAuthor) {
@@ -193,7 +212,7 @@ const resolvers = {
 
             const post = {
                 id: uuidv4(),
-                ...arg
+                ...arg.data
             }
 
             // const post = {
@@ -210,11 +229,11 @@ const resolvers = {
         },
         createComment(parent, arg, ctx, info) {
             const verifyAuthor = users.some((user) => { 
-                return user.id === arg.author
+                return user.id === arg.data.author
             }) 
 
             const verifyPost = posts.some((post) => {
-                return (post.published === true && post.id) === arg.post
+                return (post.published === true && post.id) === arg.data.post
             })
 
             if (!verifyAuthor) {
@@ -225,7 +244,7 @@ const resolvers = {
 
             const comment = {
                 id: uuidv4(),
-                ...arg
+                ...arg.data
             }
             // const comment = {
             //     id: uuidv4(),
