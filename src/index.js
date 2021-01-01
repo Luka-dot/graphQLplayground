@@ -1,6 +1,8 @@
 import { GraphQLServer } from 'graphql-yoga';
 import { v4 as uuidv4 } from 'uuid';
 
+// Spread operators plug in:  https://www.npmjs.com/package/babel-plugin-transform-object-rest-spread
+
 // temp user data before database set up
 const users = [{
     id: '1',
@@ -167,10 +169,14 @@ const resolvers = {
 
             const user = {
                 id: uuidv4(),
-                name: arg.name,
-                email: arg.email,
-                age: arg.age
+                ...arg
             }
+            // const user = {
+            //     id: uuidv4(),
+            //     name: arg.name,
+            //     email: arg.email,
+            //     age: arg.age
+            // }
 
             users.push(user)
 
@@ -187,11 +193,16 @@ const resolvers = {
 
             const post = {
                 id: uuidv4(),
-                title: arg.title,
-                body: arg.body,
-                published: arg.published,
-                author: arg.author
+                ...arg
             }
+
+            // const post = {
+            //     id: uuidv4(),
+            //     title: arg.title,
+            //     body: arg.body,
+            //     published: arg.published,
+            //     author: arg.author
+            // }
 
             posts.push(post)
 
@@ -214,10 +225,14 @@ const resolvers = {
 
             const comment = {
                 id: uuidv4(),
-                text: arg.text,
-                author: arg.author,
-                post: arg.post
+                ...arg
             }
+            // const comment = {
+            //     id: uuidv4(),
+            //     text: arg.text,
+            //     author: arg.author,
+            //     post: arg.post
+            // }
 
             comments.push(comment)
 
