@@ -1,4 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga';
+import { v4 as uuidv4 } from 'uuid';
 
 // temp user data before database set up
 const users = [{
@@ -76,6 +77,10 @@ const typeDefs = `
         posts(query: String): [Post!]!
         comments(query: String): [Comment!]!
     }
+
+    type Mutation {
+        createUser(name: String!, email: String!, age: Int): User!
+    }
     
     type User {
         id: ID!
@@ -146,6 +151,28 @@ const resolvers = {
                 body: 'This is a post to my new grapQL API',
                 published: true
             }
+        }
+    },
+    Mutation: {
+        createUser(parent,arg, ctx, info) {
+            const emailTaken = users.some((user) => {
+                return user.email === arg.email
+            })
+
+            if (emailTaken) {
+                throw new Error('This email has been already taken.')
+            }
+
+            const user = {
+                id: uuidv4(),
+                name: arg.name,
+                email: arg.email,
+                age: arg.age
+            }
+
+            users.push(user)
+
+            return user
         }
     },
     Post: {
