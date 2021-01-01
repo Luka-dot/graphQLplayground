@@ -3,68 +3,68 @@ import { v4 as uuidv4 } from 'uuid';
 
 // temp user data before database set up
 const users = [{
-    id: 1,
+    id: '1',
     name: "Lukas",
     email: "lukas@gma.com",
-    age: 39
+    age: '39'
 },
 {
-    id: 2,
+    id: '2',
     name: "Sara",
     email: "Sara@gma.com",
-    age: 29
+    age: '29'
 },
 {
-    id: 3,
+    id: '3',
     name: "Mikey",
     email: "mouse@gma.com"
 }]
 
 const posts = [{
-    id: 11,
+    id: '11',
     title: "post one",
     body: "lukas@gma.com",
     published: true,
-    author: 1
+    author: '1'
 },
 {
-    id: 12,
+    id: '12',
     title: "post TWO",
     body: "random text",
     published: true,
-    author: 1
+    author: '1'
 },
 {
-    id: 13,
+    id: '13',
     title: "post THREE",
     body: "More and more of random text",
     published: false,
-    author: 2
+    author: '2'
 }];
 
 const comments = [{
-    id: 31,
+    id: '31',
     text: 'This is first comment',
-    author: 1,
-    post: 13
+    author: '1',
+    post: '13'
 },
 {
-    id: 32,
+    id: '32',
     text: "this is another new comment",
-    author: 1,
-    post: 11
+    author: '1',
+    post: '11'
 },
 {
-    id:  33,
+    id:  '33',
     text: 'Im running out of ideas for comments',
-    author: 3,
-    post:11
+    author:' 3',
+    post:'11'
 },
 {
-    id: 34,
+    id: '34',
     text: 'Finally this is a last one I have to come up ith )',
-    author: 3,
-    post: 13
+    author: '3',
+    post: '13'
 }
 ]
 
@@ -80,6 +80,7 @@ const typeDefs = `
 
     type Mutation {
         createUser(name: String!, email: String!, age: Int): User!
+        createPost(title: String!, body: String!, published: Boolean!, author: ID! ): Post!
     }
     
     type User {
@@ -173,6 +174,27 @@ const resolvers = {
             users.push(user)
 
             return user
+        },
+        createPost(parent, arg, ctx, info) {
+            const verifyAuthor = users.some((user) => { 
+                return user.id === arg.author
+            }) 
+
+            if (!verifyAuthor) {
+                throw new Error('User not found.')
+            }
+
+            const post = {
+                id: uuidv4(),
+                title: arg.title,
+                body: arg.body,
+                published: arg.published,
+                author: arg.author
+            }
+
+            posts.push(post)
+
+            return post
         }
     },
     Post: {
