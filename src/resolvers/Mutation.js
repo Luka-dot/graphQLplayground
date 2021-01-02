@@ -1,0 +1,142 @@
+import { v4 as uuidv4 } from 'uuid';
+
+const Mutation = {
+    createUser(parent,arg, { db }, info) {
+        const emailTaken = db.users.some((user) => {
+            return user.email === arg.data.email
+        })
+
+        if (emailTaken) {
+            throw new Error('This email has been already taken.')
+        }
+
+        const user = {
+            id: uuidv4(),
+            ...arg.data
+        }
+        // const user = {
+        //     id: uuidv4(),
+        //     name: arg.name,
+        //     email: arg.email,
+        //     age: arg.age
+        // }
+
+        db.users.push(user)
+
+        return user
+    },
+    deleteUser(parent, arg, { db }, info) {
+        const userIndex = db.users.findIndex((user) => {
+            return user.id === arg.id
+        })
+
+        if (userIndex === -1) {
+            throw new Error('User not found!')
+        }
+
+        const deletedUsers = db.users.splice(userIndex, 1)  // so this deletedUser can be returned. Mutation expects return User!
+
+        db.posts = db.posts.filter((post) => {
+            const match = post.author === arg.id
+
+            if (match) {
+                db.comments = db.comments.filter((comment) => {
+                    return comment.post !== post.id
+                })
+            }
+
+            return !match
+        })
+
+        db.comments = db.comments.filter((comment) => comment.author !== arg.id)
+
+        return deletedUsers[0]
+
+    },
+    createPost(parent, arg, { db }, info) {
+        const verifyAuthor = db.users.some((user) => { 
+            return user.id === arg.data.author
+        }) 
+
+        if (!verifyAuthor) {
+            throw new Error('User not found.')
+        }
+
+        const post = {
+            id: uuidv4(),
+            ...arg.data
+        }
+
+        // const post = {
+        //     id: uuidv4(),
+        //     title: arg.title,
+        //     body: arg.body,
+        //     published: arg.published,
+        //     author: arg.author
+        // }
+
+        db.posts.push(post)
+
+        return post
+    },
+    deletePost(parent, arg, { db }, info) {
+        const existingPostIndex = db.posts.findIndex((post) => {
+            return post.id === arg.id
+        })
+
+        if (existingPostIndex === -1) {
+            throw new Error('Post not found.')
+        }
+
+        const postToRemove = db.posts.splice(existingPostIndex, 1)
+
+        db.comments = db.comments.filter((comment) => comment.post !== arg.id)
+
+        return postToRemove[0]
+    },
+    createComment(parent, arg, { db }, info) {
+        const verifyAuthor = db.users.some((user) => { 
+            return user.id === arg.data.author
+        }) 
+
+        const verifyPost = db.posts.some((post) => {
+            return (post.published === true && post.id) === arg.data.post
+        })
+
+        if (!verifyAuthor) {
+            throw new Error('Pleace check author id.')
+        } else if (!verifyPost) {
+            throw new Error('post is not published or does not exist.')
+        }
+
+        const comment = {
+            id: uuidv4(),
+            ...arg.data
+        }
+        // const comment = {
+        //     id: uuidv4(),
+        //     text: arg.text,
+        //     author: arg.author,
+        //     post: arg.post
+        // }
+
+        db.comments.push(comment)
+
+        return comment
+    },
+    deleteComment(parent, arg, { db }, info) {
+        const commentIndex = db.comments.findIndex((comment) => comment.id === arg.id)
+
+        if (!commentIndex === -1) {
+            throw new Error('comment not found.')
+        }
+
+        const deletedComment = db.comments.splice(commentIndex, 1)
+
+        comments.filter((comment) => comment.id === arg.id)
+
+        return deletedComment[0]
+    }
+}
+
+export { Mutation as default }
