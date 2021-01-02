@@ -122,6 +122,28 @@ const Mutation = {
 
         return postToRemove[0]
     },
+    updatePost(parent, arg, { db }, info) {
+        const { id, data } = arg
+        const postToUpdate = db.posts.find((post) => post.id === id)
+
+        if (!postToUpdate) {
+            throw new Error('post not found.')
+        }
+
+        if (typeof data.title === 'string') {
+            postToUpdate.title = data.title
+        }
+
+        if (typeof data.body === 'string') {
+            postToUpdate.body = data.body
+        }
+        
+        if (data.published) {
+            postToUpdate.published = data.published 
+        }
+
+        return postToUpdate
+    },
     createComment(parent, arg, { db }, info) {
         const verifyAuthor = db.users.some((user) => { 
             return user.id === arg.data.author
@@ -164,6 +186,20 @@ const Mutation = {
         comments.filter((comment) => comment.id === arg.id)
 
         return deletedComment[0]
+    },
+    updateComment(parent, arg, { db }, info) {
+        const { id, data } = arg
+        const commentToUpdate = db.comments.find((comment) => comment.id === id )
+
+        if (!commentToUpdate) {
+            throw new Error('comment not found.')
+        }
+
+        if (typeof data.text === 'string') {
+            commentToUpdate.text = data.text
+        }
+
+        return commentToUpdate
     }
 }
 
