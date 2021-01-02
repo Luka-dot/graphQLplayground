@@ -53,6 +53,34 @@ const Mutation = {
         return deletedUsers[0]
 
     },
+    updateUser(parent, arg, { db}, info) {
+        const { id, data } = arg
+        const userToUpdate = db.users.find((user) => user.id === id)
+
+        if (!userToUpdate) {
+            throw new Error('User not found')
+        }
+
+        if (typeof data.email === 'string') {
+            const emailTaken = db.users.some((user) => user.email === data.email)
+
+            if (emailTaken) {
+                throw new Error('email in use, choose different email')
+            }
+
+            userToUpdate.email = data.email
+        }
+
+        if (typeof data.name === 'string') {
+            userToUpdate.name = data.name
+        }
+
+        if (typeof data.age !== 'undefined') {
+            userToUpdate.age = data.age
+        }
+
+        return userToUpdate
+    },
     createPost(parent, arg, { db }, info) {
         const verifyAuthor = db.users.some((user) => { 
             return user.id === arg.data.author
