@@ -81,7 +81,7 @@ const Mutation = {
 
         return userToUpdate
     },
-    createPost(parent, arg, { db }, info) {
+    createPost(parent, arg, { db, pubsub }, info) {
         const verifyAuthor = db.users.some((user) => { 
             return user.id === arg.data.author
         }) 
@@ -104,6 +104,9 @@ const Mutation = {
         // }
 
         db.posts.push(post)
+        if (post.published === true) {
+            pubsub.publish('post', {post: post})
+        }
 
         return post
     },
@@ -144,7 +147,7 @@ const Mutation = {
 
         return postToUpdate
     },
-    createComment(parent, arg, { db }, info) {
+    createComment(parent, arg, { db, pubsub }, info) {
         const verifyAuthor = db.users.some((user) => { 
             return user.id === arg.data.author
         }) 
@@ -171,6 +174,7 @@ const Mutation = {
         // }
 
         db.comments.push(comment)
+        pubsub.publish(`comment ${arg.data.post}`, { comment: comment})
 
         return comment
     },
